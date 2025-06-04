@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Chatbot{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+</head>
+<body>
+    <div id="container" style="display: flex;">
+        <!-- Sidebar -->
+        <aside>
+            <ul style="list-style: none; padding: 0;">
+                <a href="{% url 'lista_chats' %}"><li>Nuevo chat</li></a>
+                <hr>
+                {% for chat in chat_list %}
+                    <a href="{% url 'ver_chat' chat.id %}">
+                        <li>{{ chat.chat_name }}</li>
+                    </a>
+                {% endfor %}
+            </ul>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit">Cerrar sesión</button>
+            </form>
+
+        </aside>
+
+        <!-- Contenido principal -->
+        <main>
+            <div class="topbar">
+                <a href="{% url 'lista_chats' %}"><div class="avatar">{{ avatar }}</div></a>
+            </div>
+            <div class="content">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

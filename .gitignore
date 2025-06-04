@@ -1,0 +1,20 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# VSCode
+.vscode/
+# PyCharm
+.idea/
+
+# SQLite
+*.sqlite3
+
+# Logs
+*.log
+
+# Cachés
+*.cache
+
+*.gguf
