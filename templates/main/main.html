@@ -6,7 +6,7 @@
 <form class="input-form" method="post">
     {% csrf_token %}
     <div class="chat-input">
-        <input class="input-box" type="text" name="contenido" placeholder="Ingresa tu pregunta" autocomplete="off" required>
+        <textarea name="contenido" class="input-box" rows="1" placeholder="Ingresa tu pregunta..." required></textarea>
         <button class="send-button" type="submit">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
                     <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/>

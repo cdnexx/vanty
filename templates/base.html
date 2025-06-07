@@ -12,27 +12,86 @@
     <div id="container" style="display: flex;">
         <!-- Sidebar -->
         <aside>
+        {% if logged %}
             <ul style="list-style: none; padding: 0;">
-                <a href="{% url 'lista_chats' %}"><li>Nuevo chat</li></a>
+                <div class="aside-header">
+                    <a href="{% url 'lista_chats' %}"><li>Nuevo chat</li></a>
+                </div>
                 <hr>
-                {% for chat in chat_list %}
-                    <a href="{% url 'ver_chat' chat.id %}">
-                        <li>{{ chat.chat_name }}</li>
-                    </a>
-                {% endfor %}
+                <div class="aside-body">
+
+                    {% for chat in chat_list %}
+                        {% if chat.state == 'active' %}
+                        <div class="chat-item">
+                            <a href="{% url 'ver_chat' chat.id %}">
+                                <li>{{ chat.chat_name }}</li>
+                            </a>
+                            <!-- Botón de 3 puntos -->
+                            <button class="menu-btn">···</button>
+
+                            <!-- Menú contextual -->
+                            <div class="context-menu">
+                                <ul>
+                                    <li class="rename-option" data-chat-id="{{ chat.id }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                                            <path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/>
+                                        </svg>
+                                        <span>Renombrar</span>
+                                    </li>
+                                    <li class="delete-option" data-chat-id="{{ chat.id }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                                            <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+                                        </svg>
+                                        <span>Eliminar</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- Modal para renombrar -->
+                    <div id="rename-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-btn" id="rename-close-btn">&times;</span>
+                        <h2>Renombrar Chat</h2>
+                        <div class="modal-edit">
+                            <input id="rename-input" type="text" placeholder="Nuevo nombre" />
+                            <button id="rename-submit-btn">Guardar</button>
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- Modal para eliminar -->
+                    <div id="delete-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-btn" id="delete-close-btn">&times;</span>
+                        <h2>Confirmar Eliminación</h2>
+                        <p>¿Estás seguro de que deseas eliminar este chat?</p>
+                        <button id="delete-cancel-btn">Cancelar</button>
+                        <button id="delete-confirm-btn">Eliminar</button>
+                    </div>
+                    </div>
+
+
+                </div>
             </ul>
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit">Cerrar sesión</button>
-            </form>
+        {% else %}
+            <div class="aside-header">
+                    <h2>Vanty chatbot</h2>
+            </div>
+        {% endif %}
 
         </aside>
 
         <!-- Contenido principal -->
         <main>
-            <div class="topbar">
-                <a href="{% url 'lista_chats' %}"><div class="avatar">{{ avatar }}</div></a>
-            </div>
+            {% if logged %}
+                <div class="topbar">
+                    <a href="{% url 'account' %}"><div class="avatar">{{ avatar }}</div></a>
+                </div>
+            {% else %}
+            {% endif %}
             <div class="content">
                 {% block content %}
                 {% endblock %}
@@ -40,6 +99,180 @@
         </main>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script>hljs.highlightAll();</script>
+
+<script>
+    // Script para resaltar el código
+    hljs.highlightAll();
+</script>
+
+<script>
+    // Cuando la página esté completamente cargada, hacer scroll al final de los mensajes
+    window.onload = function() {
+        var chatMessages = document.getElementById('chat-messages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    };
+</script>
+
+<script>
+    // Script para ajustar la altura del textarea
+    const textarea = document.querySelector('.input-box');
+
+    textarea.addEventListener('input', () => {
+        textarea.style.height = 'auto'; // resetea primero
+        textarea.style.height = textarea.scrollHeight/2 + 'px'; // ajusta al contenido
+    });
+</script>
+
+<script>
+    // Script para manejar el menú contextual de los botones de tres puntos
+    // Obtener todos los botones de tres puntos
+    const menuButtons = document.querySelectorAll('.menu-btn');
+
+    // Agregar evento de clic a cada botón
+    menuButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+        // Prevenir el clic de propagarse (para que no cierre el menú de inmediato)
+        e.stopPropagation();
+
+        // Obtener el menú contextual correspondiente al botón
+        const menu = this.nextElementSibling;
+
+        // Alternar la visibilidad del menú
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+
+    // Cerrar el menú cuando el usuario haga clic fuera del menú
+    document.addEventListener('click', function(e) {
+        // Verificar si el clic fue fuera de un menú
+        const contextMenus = document.querySelectorAll('.context-menu');
+        contextMenus.forEach(menu => {
+        if (!menu.contains(e.target) && !e.target.classList.contains('menu-btn')) {
+            menu.style.display = 'none';
+        }
+        });
+    });
+</script>
+
+<script>
+    // Script para manejar los modales de renombrar y eliminar chats
+    // Obtener modales y botones
+    const renameModal = document.getElementById('rename-modal');
+    const deleteModal = document.getElementById('delete-modal');
+
+    const renameCloseBtn = document.getElementById('rename-close-btn');
+    const deleteCloseBtn = document.getElementById('delete-close-btn');
+
+    const renameSubmitBtn = document.getElementById('rename-submit-btn');
+    const deleteConfirmBtn = document.getElementById('delete-confirm-btn');
+    const deleteCancelBtn = document.getElementById('delete-cancel-btn');
+
+    let currentChatId = null;
+
+    // Mostrar modal de renombrar
+    const renameOptions = document.querySelectorAll('.rename-option');
+    renameOptions.forEach(option => {
+        option.addEventListener('click', function() {
+        currentChatId = this.getAttribute('data-chat-id');
+        const chatItem = this.closest('.chat-item');
+        const chatName = chatItem.querySelector('li').innerText;
+
+        document.getElementById('rename-input').value = chatName;
+
+        // Mostrar modal
+        renameModal.style.display = 'block';
+        });
+    });
+
+    // Mostrar modal de eliminar
+    const deleteOptions = document.querySelectorAll('.delete-option');
+    deleteOptions.forEach(option => {
+        option.addEventListener('click', function() {
+        currentChatId = this.getAttribute('data-chat-id');
+
+        // Mostrar modal
+        deleteModal.style.display = 'block';
+        });
+    });
+
+    // Cerrar modales
+    renameCloseBtn.addEventListener('click', function() {
+        renameModal.style.display = 'none';
+    });
+
+    deleteCloseBtn.addEventListener('click', function() {
+        deleteModal.style.display = 'none';
+    });
+
+    // Eliminar chat
+    deleteConfirmBtn.addEventListener('click', function() {
+        if (currentChatId) {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            fetch(`/chat/delete/${currentChatId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken,
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    deleteModal.style.display = 'none';
+                    location.replace('/chats/'); // Redirigir a la lista de chats
+                } else {
+                    alert("Error al eliminar el chat");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    });
+
+    // Cancelar eliminación
+    deleteCancelBtn.addEventListener('click', function() {
+        deleteModal.style.display = 'none';
+    });
+
+    // Enviar el nuevo nombre del chat (para renombrar)
+    renameSubmitBtn.addEventListener('click', function() {
+        const newName = document.getElementById('rename-input').value;
+        if (newName) {
+            const chatId = currentChatId;
+
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            fetch(`/chat/rename/${chatId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: `new_name=${encodeURIComponent(newName)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    renameModal.style.display = 'none';
+                    location.reload();
+                } else {
+                    alert("Error al renombrar el chat");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    });
+
+    // Cerrar modal cuando se haga clic fuera de él
+    window.addEventListener('click', function(e) {
+        if (e.target === renameModal) {
+        renameModal.style.display = 'none';
+        }
+        if (e.target === deleteModal) {
+        deleteModal.style.display = 'none';
+        }
+    });
+</script>
+
 </body>
 </html>
