@@ -3,15 +3,15 @@
 {% block title %}Nuevo chat{% endblock %}
 
 {% block content %}
-<form class="input-form" method="post">
-    {% csrf_token %}
-    <div class="chat-input">
-        <textarea name="contenido" class="input-box" rows="1" placeholder="Ingresa tu pregunta..." required></textarea>
-        <button class="send-button" type="submit">
+<form class="input-form" id="new-chat-form" method="post">
+        {% csrf_token %}
+        <div id="chat-form" class="chat-input">
+            <textarea name="contenido" id="chat-input-box" class="input-box" rows="1" placeholder="Ingresa tu pregunta..." required></textarea>
+            <button class="send-button" type="submit">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
                     <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/>
                 </svg>
             </button>
-    </div>
-</form>
+        </div>
+    </form>
 {% endblock %}

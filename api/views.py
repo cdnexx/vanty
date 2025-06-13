@@ -51,12 +51,17 @@ class MessageCreateView(APIView):
 
             # Obtener respuesta del bot
             respuesta = bot_responder(contenido, history)
+            response_message_type = 'bot'
 
             # Guardar respuesta
+            if not respuesta or len(respuesta) < 5:
+                respuesta = "Lo siento, hubo un error al generar la respuesta."
+                response_message_type = 'system'
+                
             mensaje_bot = Message.objects.create(
                 chat=chat,
                 content=respuesta,
-                message_type='bot'
+                message_type=response_message_type
             )
 
             return Response({

@@ -185,6 +185,10 @@ main {
     align-self: flex-start;
 }
 
+.message-bot li{
+    margin: 16px 0;
+}
+
 .logout {
     margin-top: 10px;
     display: flex;
@@ -284,7 +288,11 @@ pre, code {
 }
 
 .chat-item:hover {
-  background-color: var(--primary-color-hover); /* Cambia el color al pasar el mouse */
+  background-color: var(--primary-color-hover);
+}
+
+.chat-item-selected {
+  background-color: var(--primary-color-hover);
 }
 
 /* El botón de tres puntos está oculto por defecto */
@@ -437,4 +445,33 @@ pre, code {
 
 #delete-confirm-btn:hover {
   background-color: #cc5c5c;
+}
+
+.error-message {
+  color: var(--warning-color);
+  font-size: 14px;
+  margin: 10px 0;
+}
+
+/* Loader */
+
+.dot-loader span {
+  font-size: 2rem;
+  animation: bounce 1s infinite;
+  display: inline-block;
+}
+.dot-loader span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.dot-loader span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }

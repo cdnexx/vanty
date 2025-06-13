@@ -1,20 +1,20 @@
 {% extends 'base.html' %}
 {% block title %}Iniciar sesión{% endblock %}
 {% block content %}
+
+<form class="default-form" method="post">
+    <h2>Iniciar sesión</h2>
+    {% csrf_token %}
+    <label for="id_username">Usuario:</label>
+    {{ form.username }}
+    <label for="id_password">Contraseña:</label>
+    {{ form.password }}
     {% if form.errors %}
-        <p style="color: red;">Usuario o contraseña inválidos. Inténtalo de nuevo.</p>
+        <p class="error-message">Usuario o contraseña inválidos. Inténtalo de nuevo.</p>
     {% endif %}
 
-    <form class="default-form" method="post">
-        <h2>Iniciar sesión</h2>
-        {% csrf_token %}
-        <label for="id_username">Usuario:</label>
-        {{ form.username }}
-        <label for="id_password">Contraseña:</label>
-        {{ form.password }}
-
-        <button class="default-button" type="submit">Ingresar</button>
-        <p>¿No tienes cuenta? Pide al administrador que te registre.</p>
-    </form>
+    <button class="default-button" type="submit">Ingresar</button>
+    <p>¿No tienes cuenta? Pide al administrador que te registre.</p>
+</form>
 
 {% endblock %}

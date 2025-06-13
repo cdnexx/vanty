@@ -1,0 +1,12 @@
+{% load markdown_tags %}
+<div id="chat-messages">
+    {% for mensaje in mensajes %}
+        <div class="message message-{{ mensaje.message_type }}">
+            {% if mensaje.message_type == 'bot' %}
+                {{ mensaje.content|markdownify|safe }}
+            {% else %}
+                {{ mensaje.content }}
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>

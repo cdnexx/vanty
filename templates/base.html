@@ -22,7 +22,7 @@
 
                     {% for chat in chat_list %}
                         {% if chat.state == 'active' %}
-                        <div class="chat-item">
+                        <div class="chat-item {% if chat.id == current_chat_id %}chat-item-selected{% endif %}">
                             <a href="{% url 'ver_chat' chat.id %}">
                                 <li>{{ chat.chat_name }}</li>
                             </a>
@@ -273,6 +273,69 @@
         }
     });
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('chat-form');
+    const inputBox = document.getElementById('chat-input-box');
+    const chatMessages = document.getElementById('chat-messages');
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const mensaje = inputBox.value.trim();
+        if (!mensaje) return;
+
+        // Agregar el mensaje del usuario al DOM
+        const userMessage = document.createElement('div');
+        userMessage.className = 'message message-user';
+        userMessage.textContent = mensaje;
+        chatMessages.appendChild(userMessage);
+
+        // Agregar mensaje temporal "Escribiendo..."
+        const botPlaceholder = document.createElement('div');
+        botPlaceholder.className = 'message message-bot';
+        botPlaceholder.innerHTML = '<div class="dot-loader"><span>.</span><span>.</span><span>.</span></div>';
+        chatMessages.appendChild(botPlaceholder);
+
+        // Limpiar input
+        inputBox.value = '';
+        inputBox.disabled = true;
+
+        // Scroll al fondo
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Enviar mensaje al backend
+        fetch('', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: new URLSearchParams({ contenido: mensaje })
+        })
+        .then(response => response.text())
+        .then(html => {
+            // Reemplazar solo el contenido de chat-messages
+            // const parser = new DOMParser();
+            // const doc = parser.parseFromString(html, 'text/html');
+            // const newMessages = doc.getElementById('chat-messages');
+            // chatMessages.innerHTML = newMessages.innerHTML;
+
+            // // Scroll al fondo
+            // chatMessages.scrollTop = chatMessages.scrollHeight;
+            location.reload();
+        })
+        .finally(() => {
+            inputBox.disabled = false;
+            inputBox.focus();
+        });
+    });
+});
+</script>
+
+
 
 </body>
 </html>
