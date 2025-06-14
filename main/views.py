@@ -1,3 +1,4 @@
+import time
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from .models import Chat, Message, User
@@ -30,18 +31,23 @@ def lista_chats(request):
             mensajes = list(nuevo_chat.mensajes.order_by('index'))
 
             # Obtener respuesta del bot
+            inicio = time.time()
             respuesta = bot_responder(mensajes)
+            fin = time.time()
+            tiempo_respuesta = fin - inicio # Tiempo en segundos
 
             # Crear respuesta del bot
             Message.objects.create(
                 chat=nuevo_chat,
                 content=respuesta,
-                message_type='bot'
+                message_type='bot',
+                response_time=tiempo_respuesta
             )
 
             return redirect('ver_chat', chat_id=nuevo_chat.id)
 
-    chat_list = Chat.objects.filter(user=request.user)
+    chat_list = Chat.objects.filter(user=request.user).order_by('-updated_at')
+
     user = request.user.first_name or request.user.username
     avatar = user[0].upper() if user else DEFAULT_AVATAR
     chats = Chat.objects.filter(user=request.user).order_by('-updated_at')
@@ -49,7 +55,7 @@ def lista_chats(request):
 
 @login_required(login_url='/login/')
 def ver_chat(request, chat_id):
-    chat_list = Chat.objects.filter(user=request.user)
+    chat_list = Chat.objects.filter(user=request.user).order_by('-updated_at')
     chat = Chat.objects.get(id=chat_id)
 
     if chat.user != request.user:
@@ -70,8 +76,11 @@ def ver_chat(request, chat_id):
                     history.append((mensajes[i].content, mensajes[i+1].content))
 
             mensajes = list(chat.mensajes.order_by('index'))
+            inicio = time.time()
             respuesta = bot_responder(mensajes)
-            Message.objects.create(chat=chat, content=respuesta, message_type='bot')
+            fin = time.time()
+            tiempo_respuesta = fin - inicio # Tiempo en segundos
+            Message.objects.create(chat=chat, content=respuesta, message_type='bot', response_time=tiempo_respuesta)
 
         # AJAX: retornar solo los mensajes como HTML parcial
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':

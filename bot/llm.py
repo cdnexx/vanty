@@ -18,9 +18,10 @@ EMBEDDING_MODEL_SCRIPTS = "microsoft/codebert-base"
 
 embedder_info = SentenceTransformer(EMBEDDING_MODEL_INFO)
 
-word_embedding_model = models.Transformer(EMBEDDING_MODEL_SCRIPTS)
-pooling_model = models.Pooling(word_embedding_model.get_word_embedding_dimension())
-embedder_scripts = SentenceTransformer(modules=[word_embedding_model, pooling_model])
+# word_embedding_model = models.Transformer(EMBEDDING_MODEL_SCRIPTS)
+# pooling_model = models.Pooling(word_embedding_model.get_word_embedding_dimension())
+# embedder_scripts = SentenceTransformer(modules=[word_embedding_model, pooling_model])
+embedder_scripts = embedder_info
 
 llama_model = Llama(
     model_path=str(MODEL_PATH),
@@ -156,7 +157,7 @@ def flujo_base(historial):
 
 def flujo_script(historial):
     prompt = get_prompt(SCRIPTS_PROMPT, historial, construir_historial_script)
-    return generar_respuesta(prompt, max_tokens=512)
+    return generar_respuesta(prompt, max_tokens=1024)
 
 def flujo_info(historial):
     prompt = get_prompt(INFO_PROMPT, historial, construir_historial_info)

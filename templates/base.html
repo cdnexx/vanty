@@ -22,7 +22,7 @@
 
                     {% for chat in chat_list %}
                         {% if chat.state == 'active' %}
-                        <div class="chat-item {% if chat.id == current_chat_id %}chat-item-selected{% endif %}">
+                        <div class="chat-item {% if chat.id == current_chat_id %}chat-item-selected{% endif %}" title="Creado: {{ chat.created_at }}&#10Modificado: {{ chat.updated_at }}">
                             <a href="{% url 'ver_chat' chat.id %}">
                                 <li>{{ chat.chat_name }}</li>
                             </a>

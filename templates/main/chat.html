@@ -11,7 +11,9 @@
         {% for mensaje in mensajes %}
         <div class="message message-{{ mensaje.message_type }}">
             {% if mensaje.message_type == 'bot' %}
-            {{ mensaje.content|markdownify|safe }}
+            <span title="Respuesta generada en {{ mensaje.response_time|floatformat:1 }} segundos">
+                {{ mensaje.content|markdownify|safe }}
+            </span>
             {% else %}
             {{ mensaje.content }}
             {% endif %}

@@ -37,6 +37,7 @@ class Message(models.Model):
     )
     content = models.TextField()
     sent_at = models.DateTimeField(auto_now_add=True)
+    response_time = models.FloatField(null=True, blank=True)
 
     class Meta:
         ordering = ['index']  # Para mantener el orden de los mensajes 
